@@ -7,13 +7,10 @@ import Header from "../../components/Navbar";
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const [data, setData] = useState({
-    email: "",
-  });
+  const [email, setEmail] = useState("");
 
   const forgotPassword = async (e) => {
     e.preventDefault();
-    const { email } = data;
 
     try {
       const response = await axios.post(
@@ -26,7 +23,9 @@ const ForgotPassword = () => {
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        navigate(`/Resetpassword/${email}`);
+        toast.success("OTP sent to your email");
+        localStorage.setItem("resetEmail", email);
+        navigate("/resetpassword/:id");
       }
     } catch (error) {
       console.error(error);
@@ -42,7 +41,6 @@ const ForgotPassword = () => {
           <h4 className="text-2xl font-semibold text-center mb-4">
             Forgot Password
           </h4>
-          {/* Display error message if there's any */}
           {error && (
             <div className="text-red-500 text-sm text-center mb-4">{error}</div>
           )}
@@ -54,15 +52,16 @@ const ForgotPassword = () => {
                 autoComplete="off"
                 name="email"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                value={data.email}
-                onChange={(e) => setData({ ...data, email: e.target.value })}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <button
               type="submit"
               className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              Send
+              Send OTP
             </button>
           </form>
         </div>

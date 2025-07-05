@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail,Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -11,7 +11,8 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth(); // get login function from context
+  const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,13 +30,11 @@ const LoginPage = () => {
       if (response.data.token) {
         const { token, user } = response.data;
 
-        // Save to context & localStorage
         login(token, user.username, user._id);
 
         setSuccess("Login Successful!");
         setLoading(false);
 
-        // Redirect based on user role from backend, not form data
         if (user.role === "admin") {
           navigate("/admin");
         } else {
@@ -100,13 +99,23 @@ const LoginPage = () => {
             <div className="relative">
               <Lock className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={data.password}
                 onChange={(e) => setData({ ...data, password: e.target.value })}
                 required
                 className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none transition"
               />
+              <div
+                className="absolute right-3 top-3.5 cursor-pointer text-gray-500 hover:text-orange-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </div>
             </div>
 
             <div className="text-right text-sm">

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Lock, Mail, Shield, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({
     username: "",
     email: "",
@@ -101,7 +102,7 @@ const RegisterPage = () => {
             <div className="relative">
               <Lock className="absolute left-3 top-3 text-gray-400" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={data.password}
                 onChange={handleChange}
@@ -109,12 +110,22 @@ const RegisterPage = () => {
                 placeholder="Password"
                 required
               />
+              <div
+                className="absolute right-3 top-3.5 cursor-pointer text-gray-500 hover:text-orange-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </div>
             </div>
 
             <div className="relative">
               <Shield className="absolute left-3 top-3 text-gray-400" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="confirmPassword"
                 value={data.confirmPassword}
                 onChange={handleChange}
@@ -126,6 +137,16 @@ const RegisterPage = () => {
                 placeholder="Confirm Password"
                 required
               />
+              <div
+                className="absolute right-3 top-3.5 cursor-pointer text-gray-500 hover:text-orange-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </div>
             </div>
 
             {!passwordMatch && data.confirmPassword && (
