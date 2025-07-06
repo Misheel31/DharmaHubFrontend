@@ -30,7 +30,7 @@ const AddBlogPage = () => {
     try {
       await axios.post("http://localhost:3000/api/blog/create", formData);
       setSuccess("Blog added successfully!");
-      setTimeout(() => navigate("/blogs"), 1500);
+      setTimeout(() => navigate("/blog"), 1500);
     } catch (err) {
       setError("Failed to add blog. Please try again.");
       console.error(err);
