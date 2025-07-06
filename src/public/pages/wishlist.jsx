@@ -12,14 +12,17 @@ const Wishlist = () => {
   const { _id } = useAuth();
 
   useEffect(() => {
-    const username = localStorage.getItem("username");
-    if (!username) {
+    if (!_id) {
       alert("Please log in to view your wishlist.");
+      setLoading(false);
       return;
     }
 
     fetch(`http://localhost:3000/api/wishlist/${_id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch wishlist");
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setWishlistTracks(data);
@@ -30,7 +33,7 @@ const Wishlist = () => {
       })
       .catch((error) => console.error("Failed to fetch wishlist:", error))
       .finally(() => setLoading(false));
-  }, []);
+  }, [_id]);
 
   const playAudio = (track) => {
     if (currentAudio !== track.audio) {

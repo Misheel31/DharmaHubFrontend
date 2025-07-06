@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import chantImage from "../../assets/chant.png";
 import Header from "../../components/Navbar";
+import { useAuth } from "../../Context/AuthContext";
 
 const Audio = () => {
+  const { _id: userId, username, isLoggedIn } = useAuth();
+
   const [audioTracks, setAudioTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentAudio, setCurrentAudio] = useState(null);
@@ -11,99 +14,46 @@ const Audio = () => {
   const [wishlist, setWishlist] = useState([]);
   const [likedTracks, setLikedTracks] = useState({});
   const [resumeTime, setResumeTime] = useState(0);
-  const [username, setUsername] = useState(null);
 
   const audioPlayer = useRef(null);
 
-  // Get logged-in username
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    setUsername(savedUsername);
-  }, []);
-
-  // Fetch audio tracks
   useEffect(() => {
     fetch("http://localhost:3000/api/audio")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch audio tracks");
         return res.json();
       })
-      .then((data) => setAudioTracks(data))
+      .then(setAudioTracks)
       .catch((error) => console.error("Error fetching audio tracks:", error))
       .finally(() => setLoading(false));
   }, []);
 
-  // Restore last audio state per user
   useEffect(() => {
-    if (!username) {
-      // No user logged in: clear audio state
-      setCurrentAudio(null);
-      setResumeTime(0);
-      setIsPlaying(false);
-      return;
-    }
-
-    const savedAudio = localStorage.getItem(`currentAudio_${username}`);
-    const savedTime = parseFloat(
-      localStorage.getItem(`currentTime_${username}`)
-    );
-    const wasPlaying = localStorage.getItem(`isPlaying_${username}`) === "true";
-
-    if (savedAudio) {
-      setCurrentAudio(savedAudio);
-      setResumeTime(isNaN(savedTime) ? 0 : savedTime);
-      setIsPlaying(wasPlaying);
-    } else {
-      // No saved data for this user
-      setCurrentAudio(null);
-      setResumeTime(0);
-      setIsPlaying(false);
-    }
-  }, [username]);
-
-  // When resumeTime or currentAudio changes, update the audio player's currentTime
-  useEffect(() => {
-    if (audioPlayer.current && currentAudio) {
-      audioPlayer.current.currentTime = resumeTime;
-    }
-  }, [resumeTime, currentAudio]);
-
-  // Save audio state per user every second
-  useEffect(() => {
-    if (!username) return; // don't save if no user
-
-    const saveAudioState = () => {
-      if (audioPlayer.current) {
-        localStorage.setItem(`currentAudio_${username}`, currentAudio || "");
-        localStorage.setItem(
-          `currentTime_${username}`,
-          audioPlayer.current.currentTime
-        );
-        localStorage.setItem(`isPlaying_${username}`, isPlaying);
-      }
-    };
-    const interval = setInterval(saveAudioState, 1000);
-    return () => clearInterval(interval);
-  }, [currentAudio, isPlaying, username]);
-
-  // Wishlist per user
-  useEffect(() => {
-    if (!username) {
+    if (!userId) {
       setWishlist([]);
+      setLikedTracks({});
       return;
     }
 
-    const savedWishlist = JSON.parse(
-      localStorage.getItem(`wishlist_${username}`) || "[]"
-    );
-    setWishlist(savedWishlist);
-  }, [username]);
-
-  useEffect(() => {
-    if (username) {
-      localStorage.setItem(`wishlist_${username}`, JSON.stringify(wishlist));
-    }
-  }, [wishlist, username]);
+    fetch(`http://localhost:3000/api/wishlist/user/${userId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch wishlist");
+        return res.json();
+      })
+      .then((data) => {
+        setWishlist(data);
+        const likedMap = {};
+        data.forEach((item) => {
+          likedMap[item._id] = true;
+        });
+        setLikedTracks(likedMap);
+      })
+      .catch((error) => {
+        console.error("Error fetching wishlist:", error);
+        setWishlist([]);
+        setLikedTracks({});
+      });
+  }, [userId]);
 
   const playAudio = (track) => {
     const isSameTrack = currentAudio === track.audio;
@@ -123,44 +73,48 @@ const Audio = () => {
     }
   };
 
-  // Ensure new audio is loaded before playing
   useEffect(() => {
     if (audioPlayer.current && currentAudio) {
       audioPlayer.current.load();
+      audioPlayer.current.currentTime = resumeTime;
       if (isPlaying) {
         audioPlayer.current.play();
       }
     }
-  }, [currentAudio]);
+  }, [currentAudio, isPlaying, resumeTime]);
 
   const toggleLike = async (track) => {
-    if (!username) {
+    if (!isLoggedIn || !userId) {
       alert("Please login to add to wishlist");
       return;
     }
 
-    const isLiked = likedTracks[track._id];
+    const existingItem = wishlist.find(
+      (item) => item.audio === track.audio && item.title === track.title
+    );
 
-    setLikedTracks((prev) => ({
-      ...prev,
-      [track._id]: !isLiked,
-    }));
+    if (existingItem) {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/wishlist/${existingItem._id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (!res.ok) throw new Error("Failed to remove from wishlist");
 
-    if (isLiked) {
-      const itemToRemove = wishlist.find((item) => item._id === track._id);
-      if (itemToRemove) {
-        try {
-          await fetch(
-            `http://localhost:3000/api/wishlist/${itemToRemove._id}`,
-            {
-              method: "DELETE",
-            }
-          );
-          setWishlist((prev) => prev.filter((item) => item._id !== track._id));
-          alert("Removed from wishlist");
-        } catch (error) {
-          console.error("Failed to remove from wishlist:", error);
-        }
+        setWishlist((prev) =>
+          prev.filter((item) => item._id !== existingItem._id)
+        );
+        setLikedTracks((prev) => {
+          const copy = { ...prev };
+          delete copy[existingItem._id];
+          return copy;
+        });
+        alert("Removed from wishlist");
+      } catch (error) {
+        console.error("Failed to remove from wishlist:", error);
+        alert("Could not remove from wishlist.");
       }
     } else {
       try {
@@ -172,27 +126,28 @@ const Audio = () => {
           body: JSON.stringify({
             title: track.title,
             description: track.description,
-            audio: track.audio,
-            imageUrl: track.imageUrl,
-            username,
+            audio: track.audio.replace(/\\/g, "/"),
+            imageUrl: track.imageUrl || "",
+            userId,
           }),
         });
 
+        if (!res.ok) throw new Error("Failed to add to wishlist");
+
         const newItem = await res.json();
         setWishlist((prev) => [...prev, newItem]);
+        setLikedTracks((prev) => ({ ...prev, [newItem._id]: true }));
         alert("Added to wishlist!");
       } catch (error) {
         console.error("Failed to add to wishlist:", error);
+        alert("Could not add to wishlist.");
       }
     }
   };
 
   const handleEnded = () => {
     setIsPlaying(false);
-    if (username) {
-      localStorage.removeItem(`isPlaying_${username}`);
-      localStorage.removeItem(`currentTime_${username}`);
-    }
+    setResumeTime(0);
   };
 
   if (loading) {
@@ -264,8 +219,7 @@ const Audio = () => {
           })}
         </div>
 
-        {/* Show audio player only if user logged in AND there is an audio playing */}
-        {username && currentAudio && (
+        {currentAudio && (
           <div className="bg-[#f0d7d7] px-6 py-4 shadow fixed bottom-0 w-full">
             <audio
               ref={audioPlayer}
@@ -279,7 +233,10 @@ const Audio = () => {
               }}
             >
               <source
-                src={`http://localhost:3000/${currentAudio}`}
+                src={`http://localhost:3000/${currentAudio.replace(
+                  /\\/g,
+                  "/"
+                )}`}
                 type="audio/mpeg"
               />
               Your browser does not support the audio element.
