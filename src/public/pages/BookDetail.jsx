@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { FaBookOpen, FaHeart } from "react-icons/fa";
+import { FaBookOpen } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import Header from "../../components/Navbar";
 
@@ -49,7 +49,7 @@ const BookDetailPage = () => {
   return (
     <>
       <Header />
-      <div className="h-full bg-[#F8E1E1] pt-32 px-6 pb-12 flex flex-col md:flex-row gap-10 justify-center items-start">
+      <div className="min-h-screen bg-[#F8E1E1] pt-32 px-6 pb-12 flex flex-col md:flex-row gap-10 justify-center items-start">
         {/* Book Image */}
         <div className="w-full md:w-[300px] flex justify-center">
           <img
@@ -112,10 +112,10 @@ const BookDetailPage = () => {
               </a>
             )} */}
 
-            <button className="flex items-center gap-2 bg-red-400 text-white px-5 py-2 text-sm rounded-full font-semibold hover:bg-red-500 transition cursor-pointer">
+            {/* <button className="flex items-center gap-2 bg-red-400 text-white px-5 py-2 text-sm rounded-full font-semibold hover:bg-red-500 transition cursor-pointer">
               <FaHeart />
               Add to Favorites
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

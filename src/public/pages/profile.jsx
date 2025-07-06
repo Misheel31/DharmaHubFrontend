@@ -5,32 +5,30 @@ import Header from "../../components/Navbar";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { username, updateUsername } = useAuth();
+  const { username, updateUsername, _id } = useAuth();
 
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-  });
-
+  const [formData, setFormData] = useState({ username: "" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!username) {
+    if (!_id) {
       navigate("/login");
       return;
     }
 
-    fetch(`http://localhost:3000/api/user/${username}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setFormData({
-          username: data.username || "",
-          email: data.email || "",
-        });
+    fetch(`http://localhost:3000/api/user/${_id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("User not found");
+        return res.json();
       })
-      .catch((err) => console.error("Failed to fetch user data", err))
+      .then((data) => {
+        setFormData({ username: data.username || "" });
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user data", err);
+      })
       .finally(() => setLoading(false));
-  }, [username, navigate]);
+  }, [_id, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,15 +39,16 @@ const Profile = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`http://localhost:3000/api/user/${username}`, {
+      const res = await fetch(`http://localhost:3000/api/user/${_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ username: formData.username }),
       });
 
       if (!res.ok) throw new Error("Failed to update profile");
 
-      updateUsername(formData.name);
+      const data = await res.json();
+      updateUsername(data.user.username);
       alert("Profile updated successfully!");
     } catch (error) {
       console.error(error);
@@ -83,18 +82,6 @@ const Profile = () => {
                 required
               />
             </div>
-            <div>
-              <label className="block font-medium mb-1">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full border rounded px-4 py-2"
-                required
-              />
-            </div>
-            <div></div>
             <button
               type="submit"
               className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700"

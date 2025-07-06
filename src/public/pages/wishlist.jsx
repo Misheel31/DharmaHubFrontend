@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaHeart } from "react-icons/fa";
-import heartsutraImage from "../../assets/heartsutra.png";
 import Header from "../../components/Navbar";
+import { useAuth } from "../../Context/AuthContext";
 
 const Wishlist = () => {
   const [wishlistTracks, setWishlistTracks] = useState([]);
@@ -9,6 +9,7 @@ const Wishlist = () => {
   const [currentAudio, setCurrentAudio] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioPlayer = useRef(null);
+  const { _id } = useAuth();
 
   useEffect(() => {
     const username = localStorage.getItem("username");
@@ -17,7 +18,7 @@ const Wishlist = () => {
       return;
     }
 
-    fetch(`http://localhost:3000/api/wishlist/${username}`)
+    fetch(`http://localhost:3000/api/wishlist/${_id}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

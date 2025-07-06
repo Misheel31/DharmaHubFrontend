@@ -112,7 +112,7 @@ export default function Header() {
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-opacity-500 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-opacity-30 backdrop-blur-sm z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
             <h2 className="text-xl font-semibold mb-4">Confirm Logout</h2>
             <p className="mb-6 text-gray-700">
