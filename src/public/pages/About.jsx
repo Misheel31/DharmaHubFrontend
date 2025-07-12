@@ -38,7 +38,7 @@ const AboutUs = () => {
               Our Journey
             </h2>
             <p className="text-md text-gray-800 leading-relaxed max-w-4xl mx-auto">
-              Dharma Hub began as a small idea among friends — one that
+              Dharma Hub began as a small idea — one that
               recognized how difficult it can be to find well-organized,
               respectful, and meaningful spiritual resources online. Inspired by
               the teachings of Thich Nhat Hanh, the Dalai Lama, and the heart of
