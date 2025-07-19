@@ -1,12 +1,54 @@
-# React + Vite
+# The Dharma Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Dharma Hub is a web-based platform designed to provide Buddhist practitioners and spiritual seekers with easy access to teachings, cultural resources, audio chanting, blogs, and books in one unified space.
 
-Currently, two official plugins are available:
+## Screenshots
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. Landing Page
 
-## Expanding the ESLint configuration
+![Landing Page](./assets/images/landing-page.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. Login Page
+
+![Login Page](./assets/images/login.png)
+
+### 3. Register Page 
+
+![Register Page](./assets/images/Register_3.png)
+
+### 4. Home Page
+
+![Home Page](./assets/images/Home.png)
+![Home section](./assets/images/HomeSection.png)
+
+### 6. Festival Page
+
+![Festival](./assets/images/Festivals.png)
+
+### 7. Learn The Dharma
+
+![Introduction To Buddhism](./assets/images/Intro.png)
+![Four Noble Truth](./assets/images/FourNobleTruth.png)
+
+### 8. Events
+
+![Events](./assets/images/Events_2.png)
+![Events Detail](./assets/images/EventDetail.png)
+
+### 9. Blogs
+
+![Blogs](./assets/images/Blogs.png)
+![Blogs Detail](./assets/images/BlogDetail.png)
+![Add Blog](.assets/images/AddBlog.png)
+
+### 10. Books
+
+![Books](./assets/images/Books.png)
+
+### 11. Wishlist
+
+![Wishlist](./assets/images/Wishlist.png)
+
+### 12. Audio
+
+![Audio](.assests/images/Audion.png)
