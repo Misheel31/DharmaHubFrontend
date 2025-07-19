@@ -51,4 +51,4 @@ The Dharma Hub is a web-based platform designed to provide Buddhist practitioner
 
 ### 12. Audio
 
-![Audio](./src/assests/images/Audio.png)
+![Audio](./src/assets/images/Audio.png)
